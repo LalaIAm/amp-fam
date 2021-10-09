@@ -1,0 +1,56 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  bio         String?
+  createdAt   DateTime   @default(now())
+  firstName   String?
+  household   Household? @relation(fields: [householdId], references: [id])
+  householdId String?
+  id          String     @id @default(cuid())
+  lastName    String?
+  lists       List[]
+  password    String
+  roles       String[]
+  updatedAt   DateTime   @updatedAt
+  username    String     @unique
+}
+
+model Household {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  lists     List[]
+  members   User[]
+  name      String
+  updatedAt DateTime @updatedAt
+}
+
+model List {
+  createdAt   DateTime  @default(now())
+  household   Household @relation(fields: [householdId], references: [id])
+  householdId String
+  id          String    @id @default(cuid())
+  items       Item[]
+  owner       User      @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  title       String
+  updatedAt   DateTime  @updatedAt
+}
+
+model Item {
+  completed Boolean?
+  createdAt DateTime  @default(now())
+  details   String?
+  dueDate   DateTime?
+  id        String    @id @default(cuid())
+  list      List      @relation(fields: [listId], references: [id])
+  listId    String
+  title     String
+  updatedAt DateTime  @updatedAt
+}
